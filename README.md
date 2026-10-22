@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# voipweb
 
-## Getting Started
+Softphone berbasis web: panggil nomor lewat browser, lihat riwayat panggilan, kelola akun. Antarmuka dibangun dengan Next.js dan dirancang untuk berbicara dengan server SIP **Kamailio** di belakangnya.
 
-First, run the development server:
+## Fitur
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Dialpad** lengkap dengan status panggilan (idle, calling, ringing, in-call, ended)
+- **Riwayat panggilan** per pengguna
+- **Login** memakai nomor SIP dan password, state-nya dijaga lewat React context
+- **Dashboard** dan halaman About
+- Lapisan data ke MySQL (skema Kamailio) lewat connection pool
+
+## Stack
+
+- Next.js 15 (App Router) + React 19 + TypeScript
+- Tailwind CSS + komponen Radix UI
+- MySQL (`mysql2`) sebagai database Kamailio
+- SIP signaling: `src/lib/sip-service.ts` (saat ini masih mock; siap diganti ke [JsSIP](https://jssip.net) atau [SIP.js](https://sipjs.com) untuk koneksi nyata ke Kamailio)
+
+## Struktur
+
+```
+src/app/            halaman: login, dashboard, call, about
+src/app/components/  dialpad, call-history, navbar, footer
+src/lib/sip-service.ts  lapisan SIP (connect, call, hangup, event)
+src/lib/db.ts           pool koneksi MySQL ke Kamailio
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Menjalankan
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Butuh Node.js 18+ dan server Kamailio dengan database MySQL.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+cp .env.example .env.local   # isi kredensial DB kalau filenya ada
+npm run dev
+```
 
-## Learn More
+Buka http://localhost:3000.
 
-To learn more about Next.js, take a look at the following resources:
+Konfigurasi database lewat environment variable (lihat `src/lib/db.ts`):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+DB_HOST=localhost
+DB_USER=kamailio
+DB_PASSWORD=...
+DB_NAME=kamailio
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Status
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Proyek pembelajaran seputar VoIP dan WebRTC/SIP. Bagian UI dan alur panggilan sudah jalan; koneksi SIP nyata ke Kamailio masih berupa mock yang tinggal disambungkan ke JsSIP/SIP.js.
